@@ -1,0 +1,228 @@
+<ion-view view-title="Chats">
+    <div class="bar bar-header bar-stable" >
+        <h1 class="title">InstBot</h1>
+        <section style="margin-top: 5px;">
+            <!--<span class="pa-recording-title" ng-if="chat.listening">Listening...</span>-->
+            <div style="height: 50px; width: 50px;" ng-click='chats.logout()' ><img  style="height: 25px; width: 25px;" src="images/logout.jpg" alt="Recording" /></div>
+          </section>
+   
+      </div>
+  <ion-content style="margin-top: 48px;">
+      
+      
+        
+    <div class="pa-body">
+    <section id="chatAI-main-container" class="chatAI-main-container">
+      
+  <ul class="chatAI-response-list">
+
+    <li id="chatAI-response-item-01" class="chatAI-response-item chatAI-response-system">
+      <span class="chatAI-response-icon"></span>
+      <span class="chatAI-response-text-robot">{{chats.defaultText}}</span>
+    </li>
+
+
+
+       <div ng-repeat="info in chats.chatInfo track by $index ">
+
+           
+         <li ng-if="info.userInput !== ''" id="chatAI-response-item-02" class="chatAI-response-item chatAI-response-user">
+            <span class="chatAI-response-icon"><img src="images/customer.png" alt="user avatar" /></span>
+            <span class="chatAI-response-text" >
+            {{info.userInput }}
+            </span>
+        </li>
+
+        <li   id="chatAI-response-item-03" class="chatAI-response-item chatAI-response-system">
+                    <span class="chatAI-response-icon"></span>
+                    <span class="chatAI-response-text-robot"> {{info.description }}  </span>
+       </li>
+        
+        <div ng-if="info.type == 'List'" >
+            <div  ng-if="info.action == 'instbot.placement'">
+                <div class="list card" style="width: 60%" >
+                    <div class="item item-divider">
+                        Our students placed
+                    </div>
+                    <div ng-repeat="placement in info.payload track by $index ">
+                        <a class="item" >
+                                {{placement.company}} - {{placement.location}} - {{placement.position}}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div  ng-if="info.action == 'instbot.timetable'">
+              <div class="list card" style="width: 80%" >
+                  <div ng-if="info.payload.type === 'daily'">
+                        <div class="item item-divider">
+                                <div class = "row">
+                                        <div class = "col">Time</div>
+                                        <div class = "col">Subject</div>
+                                        <div class = "col">professor</div>
+                                </div>
+                        </div>
+                        <div class = "row" ng-repeat="dailytime in info.payload.time track by $index ">
+                                <div class = "col">{{dailytime.startTime}}-{{dailytime.endTime}} </div>
+                                <div class = "col">{{dailytime.subjname}}</div>
+                                <div class = "col">{{dailytime.prof}}</div>
+                        </div> 
+                  </div>
+                  <div ng-if="info.payload.type === 'weekly'">
+                        <div class="item item-divider">
+                                <div class = "row">
+                                        <div class = "col">Days</div>
+                                        <div class = "col">9 - 11 AM</div>
+                                        <div class = "col">11 - 12 AM</div>
+                                        <div class = "col">1 - 2 PM</div>
+                                        <div class = "col">2 - 3 PM</div>
+                                        <div class = "col">3 - 4 PM</div>
+                                </div>
+                        </div>
+                        <div class = "row" ng-repeat="(key, weeklytime) in info.payload.weekly track by $index ">
+                                <div class = "col">{{key}}</div>
+                               <div ng-repeat="time in weeklytime track by $index " class = "col">{{time.subjname}}</div>
+                                
+                        </div> 
+                    </div>
+                  
+              </div>
+              <div ng-if="info.followup" style="width: 60%; background-color: grey;"  ng-click="chats.getResponse('show {{info.payload.type == 'daily'? 'weekly' : 'daily'}} time table')">
+                <a class="item" >
+                       Show {{info.payload.type == 'daily'? 'Weekly' : 'Daily'}} Time table
+                </a>
+            </div>
+          </div>
+          <div  ng-if="info.action == 'instbot.examtime'">
+            <div class="list card" style="width: 60%" >
+                        <div class="item item-divider">
+                                <div class = "row">
+                                        <div class = "col">Exam Date</div>
+                                        <div class = "col">Time</div>
+                                        <div class = "col">Subject</div>
+                                </div>
+                        </div>
+                        <div class = "row" ng-repeat="examtime in info.payload.examtime track by $index ">
+                                <div class = "col">{{examtime.Date}}</div>
+                                <div class = "col">{{examtime.time}}</div>
+                                <div class = "col">{{examtime.subject}}</div>
+                        </div>               
+                
+            </div>
+        </div>      
+            <div  ng-if="info.action == 'instbot.help'">
+              <div class="list card" style="width: 60%" >
+                  <div ng-repeat="help in info.payload.helps track by $index ">
+                      <a href="#" class="item" >
+                              {{help.title}}
+                      </a>
+                  </div>
+              </div>
+          </div>
+            
+        </div>
+        <div ng-if="info.type == 'Card'">
+            <div  ng-if="info.action == 'instbot.attendance'">
+                <div class="card" ng-repeat="attendance in info.payload track by $index " style="width: 40%">
+                        <div class="item item-divider">
+                          Attendance Percentage
+                        </div>
+                          <div class="item item-text-wrap">
+                            
+                            <p> {{attendance.percentage}}</p>
+                        <!--    <p>{{attendance.percentage}}</p> -->
+                          </div>
+                      <!--  <div class="item item-divider">
+                          percentage: {{attendance.percentage}}
+                        </div> -->
+                </div>
+            </div>
+            <div  ng-if="info.action == 'instbot.studentlookup'">
+                    <div class="card" style="width: 60%" ng-repeat="student in info.payload.students track by $index " >
+                        <div class="item item-divider">
+                           {{student.name}}
+                        </div>
+                        <div class="item item-text-wrap">
+                            <p> Year: {{student.year}}</p>
+                            <p>Dept: {{student.dept}}</p> 
+                            <p>Gender: {{student.gender}}</p>
+                            <p>DOB: {{student.birthdate}}</p> 
+                        </div>
+                        <div class="item item-divider">
+                            Email: {{student.email}}
+                        </div>
+                    </div>
+                </div>
+           
+
+        </div>
+         <!--<li   id="pa-response-item-03" class="pa-response-item pa-response-system">
+           <span class="pa-response-icon"></span>
+           <span class="pa-response-text"> {{info.description }}  </span>
+           <span class="pa-response-text" ng-if="info.url !== ''"> <a href="{{info.url }}">{{info.url }} </a>  {{info.buildNumber }}   </span>
+         </li>
+         <div ng-if="info.action == 'Meeting'">
+         <li class="pa-response-item pa-response-system pa-response-card">
+           <span class="pa-card-header">{{info.name}}</span>
+           <span class="pa-card-content">{{info.timeDetails}}</span>
+           <span class="pa-card-footer"><a href="#">Open Calendar Invite</a></span>
+         </li>
+       </div>-->
+
+       <!--<div ng-if="info.action == ''">
+						 <li   id="chatAI-response-item-03" class="chatAI-response-item chatAI-response-system">
+						   <span class="chatAI-response-icon"></span>
+						   <span class="chatAI-response-text"> {{info.description }}  </span>
+						 </li>
+					  </div>
+            <div ng-if="info.tickets.length !== 0">
+              <li ng-repeat="ticket in info.tickets track by $index " class="chatAI-response-item chatAI-response-system chatAI-response-card">
+  						<a ng-click="chat.getResponse(\'{{ticket}}\')">{{ticket}}</a>
+            </li>
+            </div>
+            <div ng-if="info.ticketDetails">
+              
+            </div> -->
+					 <!--<div ng-if="info.action == 'final'">
+						<li class="chatAI-response-item chatAI-response-system chatAI-response-card">
+						<span class="chatAI-card-header">{{info.name}}</span>
+						<span class="chatAI-card-content detailsview">{{info.description}}</span>
+
+						<br>
+						<span class="chatAI-card-footer" ng-if="info.url !== ''">
+						<span ng-if="info.fileType !=='youtube'">
+							<div class="findmoredetails"> You can learn more in the below URL: </div>
+							<a href='{{info.url}}'>{{info.url}}</a>
+						</span>
+
+							<span ng-if="info.fileType ==='youtube'">
+							<iframe ng-src="info.url" frameborder="0"></iframe> </span>
+						</span>
+
+						</li>
+
+          </div>-->
+     </div>
+
+
+
+    <li id="chatAI-response-typing"  ng-if="Loading"  class="chatAI-response-item chatAI-response-system pa-response-typing">
+      <span class="chatAI-response-icon"></span>
+      <span class="chatAI-response-text"></span>
+    </li>
+
+
+  </ul>
+
+</section>
+
+<footer id="chatAI-footer" class="chatAI-footer">
+  <input type="text"  ng-model="chats.txtChat" class="chatAI-command-input"  ng-keydown="$event.keyCode === 13 && chats.getResponse()"/>
+  <!--<div><a onclick="chat.getResponse()">Chat</a></div>-->
+</footer>
+<section class="chatAI-recording">
+  <!--<span class="pa-recording-title" ng-if="chat.listening">Listening...</span>-->
+  <span class="chatAI-recording-icon" ng-click='chats.sendVoice()'><img src="images/icon-recording.png" alt="Recording" /></span>
+</section>
+</div>
+  </ion-content>
+</ion-view>
